@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        /* Style the gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust the minmax width as needed */
+            grid-gap: 10px;
+            justify-content: center;
+        }
+    
+        /* Ensure text within the image container is visible and not overflowing */
+        .gallery .image-container p {
+            font-size: 12px; /* Adjust as needed */
+            color: #000; /* Adjust color as needed */
+            margin: 0; /* Remove default margins */
+            text-align: center; /* Center-align text */
+            overflow: cover; 
+            text-overflow: ellipsis; /* Show ellipsis if text is too long */
+            white-space: nowrap; /* Keep the timestamp in one line */
+            width: 100%; /* Ensure the p tag uses the full width of its parent */
+        }
+
+        /* Style the images */
+        .gallery img {
+            width: 80%; /* Make images fill the entire container */
+            height: 80%; /* Make images fill the entire container */
+            object-fit: cover; /* Cover the container without losing aspect ratio */
+            cursor: pointer;
+        }
+
+    
+        /* Add hover effect */
+        .gallery img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    
+</head>
+<body>
+
+<div class="gallery" id="gallery">
+    <!-- Images will be added dynamically here -->
+</div>
+
+<script>
+    // Function to fetch new images from the server
+    function fetchNewImages() {
+        fetch('/new_images')
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = ''; // Clear existing images
+                data.forEach(imageInfo => {
+                    const timestamp = new Date(imageInfo.timestamp * 1000); // Convert from Unix timestamp to milliseconds
+                    const imgContainer = document.createElement('div'); // Container for image and timestamp
+                    const img = document.createElement('img'); // Image element
+                    img.src = `static/images/${imageInfo.name}`;
+                    imgContainer.appendChild(img); // Append image to container
+                    const timestampText = document.createElement('p'); // Timestamp text element
+                    timestampText.textContent = `Timestamp: ${timestamp.toLocaleString()}`; // Format timestamp
+                    imgContainer.appendChild(timestampText); // Append timestamp to container
+                    gallery.appendChild(imgContainer); // Append container to gallery
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching new images:', error);
+            });
+    }
+
+    // Fetch new images every 5 seconds (adjust as needed)
+    setInterval(fetchNewImages, 5000);
+</script>
+
+
+
+
+
+</body>
+</html>
